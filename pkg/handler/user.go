@@ -31,7 +31,7 @@ type Handler struct {
 }
 
 // create handles the user create request
-func (h *Handler) create() http.HandlerFunc {
+func (h *Handler) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := &model.User{}
 		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
