@@ -1,16 +1,13 @@
 package conn
 
 import (
-	"regexp"
 	"testing"
 )
 
 func TestGetConnection(t *testing.T) {
-	item := "jdnfksdmfksd"
-	want := regexp.MustCompile(`\b` + item + `\b`)
-	msg := GoDotEnvVariable("ACCESS_SECRET")
+	db, err := GetConnection()
 
-	if !want.MatchString(msg) {
-		t.Fatalf(`GoDotEnvVariable("ACCESS_SECRET") = %q, want match for %#q`, msg, want)
+	if db == nil || err != nil {
+		t.Fatalf(`Fail to connect the data base for %#v and  %#q`, db, err)
 	}
 }

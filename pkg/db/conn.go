@@ -3,8 +3,8 @@ package conn
 import (
 	"database/sql"
 
-	"../utils"
 	_ "github.com/lib/pq"
+	"github.com/u-library/pkg/utils"
 )
 
 // const (
@@ -23,7 +23,7 @@ func GetConnection() (*sql.DB, error) {
 
 	if err == nil {
 		err = db.Ping()
-		if err == nil {
+		if err != nil {
 			return nil, err
 		} else {
 			return db, nil

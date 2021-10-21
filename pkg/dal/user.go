@@ -1,12 +1,12 @@
 package dal
 
 import (
-	"errors"
-	"fmt"
 	"time"
 
-	model "../model"
-	conn "github.com/rpinedafocus/mylib-dbconn"
+	conn "github.com/rpinedafocus/u-library/pkg/db"
+	"github.com/rpinedafocus/u-library/pkg/model"
+	"github.com/rpinedafocus/u-library/pkg/utils"
+	"github.com/u-library/pkg/utils"
 )
 
 const uuidLength = 36
@@ -18,7 +18,7 @@ type User struct {
 func (u *User) Create(user *model.User) (*model.UserEntity, error) {
 
 	if user == nil {
-		return nil, errors.New("user can not be nil")
+		return nil, utils.EmtpyModel
 	}
 
 	now := time.Now()
@@ -26,7 +26,7 @@ func (u *User) Create(user *model.User) (*model.UserEntity, error) {
 	e := &model.UserEntity{
 		Entity: model.Entity{
 			ID:        u.GenerateUUID(),
-			CreatedBy: "",
+			CreatedBy: "root",
 			CreatedAt: now,
 		},
 		User: model.User{
@@ -36,16 +36,18 @@ func (u *User) Create(user *model.User) (*model.UserEntity, error) {
 			LastName:  user.LastName,
 			Email:     user.Email,
 			Role:      user.Role,
-			Active:    true,
 		},
 	}
 
-	const stmt = `INSERT INTO university.users (id,user,password,first_name,last_name,email,role,created_by, created_at,active) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)`
+	const stmt = `INSERT INTO university.users (id,user,password,first_name,last_name,email,role,created_by, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`
 
-	db, errc := conn.GetConnection()
-
-	if _, err := u.DB.ExecContext(ctx, stmt, e.ID, e.FirstName, e.LastName, e.CreatedAt, e.UpdatedAt); err != nil {
-		return nil, fmt.Errorf("user create insert %w", err)
+	if db, errc := conn.GetConnection(); errc != nil {
+		return nil, utils.DBCDBConnectionError
 	}
+
+	if _, err := db.Exec(stmt, e.Entity.ID, e.User.User, e.User.Password, e.User.FirstName, e.User.LastName, e.User.Email, e.User.Role, e.Entity.CreatedBy, e.Entity.CreatedAt); err != nil {
+		return nil, utils.ErrCreatingRow
+	}
+
 	return e, nil
 }
