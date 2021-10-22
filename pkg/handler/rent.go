@@ -4,27 +4,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/pkg/dal"
 	"github.com/rpinedafocus/u-library/pkg/model"
-	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
 // create handles the user create request
-func CreateUserController(c *gin.Context) (*model.UserEntity, string) {
+func CreateRentController(c *gin.Context) (*model.BookingRentEntity, string) {
 
-	user := &model.User{}
+	rent := &model.BookingRent{}
 
-	if err := c.BindJSON(&user); err != nil {
-		return nil, utils.ErrorX(400)
+	if err := c.BindJSON(&rent); err != nil {
+		return nil, err.Error() //utils.ErrorX(400)
 	}
 
-	temppw, err := utils.HashPassword(user.Password)
+	entity, err := dal.CreateRent(rent)
 	if err != nil {
-		return nil, err.Error()
-	}
-	user.Password = temppw
-
-	entity, err := dal.CreateUser(user)
-	if err != nil {
-		return nil, utils.ErrorX(400)
+		return nil, err.Error() //utils.ErrorX(400)
 	}
 
 	return entity, ""

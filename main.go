@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	handler "github.com/rpinedafocus/u-library/pkg/handler"
 )
 
 var (
@@ -60,7 +62,13 @@ var (
 /**********	MAIN	************/
 func main() {
 
-	router.POST("/user/create", handler.create)
+	router.POST("/user/create", CreateUser)
+	router.POST("/role/create", CreateRol)
+	router.POST("/genre/create", CreateGenre)
+	router.POST("/author/create", CreateAuthor)
+	router.POST("/book/create", CreateBook)
+	router.POST("/booking/create", CreateBooking)
+	router.POST("/rent/create", CreateRent)
 	//router.POST("/logins", Login)
 	// router.GET("/authors", getAuthors)
 	// router.GET("/books", getBooks)
@@ -85,6 +93,76 @@ func main() {
 	// router.POST("/logout", Logout)
 
 	log.Fatal(router.Run("localhost:8080"))
+}
+
+func CreateUser(c *gin.Context) {
+	ent, response := handler.CreateUserController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateRol(c *gin.Context) {
+	ent, response := handler.CreateRolController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateGenre(c *gin.Context) {
+	ent, response := handler.CreateGenreController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateAuthor(c *gin.Context) {
+	ent, response := handler.CreateAuthorController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateBook(c *gin.Context) {
+	ent, response := handler.CreateBookController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateBooking(c *gin.Context) {
+	ent, response := handler.CreateBookingController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
+}
+
+func CreateRent(c *gin.Context) {
+	ent, response := handler.CreateRentController(c)
+
+	if response == "" {
+		c.IndentedJSON(http.StatusOK, ent)
+	} else {
+		c.IndentedJSON(http.StatusBadRequest, response)
+	}
 }
 
 /*********** END POINTS	***********/

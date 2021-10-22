@@ -9,42 +9,41 @@ import (
 	"github.com/twinj/uuid"
 )
 
-func CreateUser(user *model.User) (*model.UserEntity, error) {
+func CreateBook(book *model.Book) (*model.BookEntity, error) {
 
-	if user == nil {
+	if book == nil {
 		return nil, utils.EmtpyModel
 	}
 
 	now := time.Now()
 
-	e := &model.UserEntity{
+	e := &model.BookEntity{
 		Entity: model.Entity{
 			ID:        utils.RemoveHyphens(uuid.NewV4().String()),
 			CreatedBy: "root",
 			CreatedAt: now.Format("01-02-2006"),
 		},
-		User: model.User{
-			User:      user.User,
-			Password:  user.Password,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-			Role:      user.Role,
+		Book: model.Book{
+			Title:          book.Title,
+			AuthorId:       book.AuthorId,
+			GenreId:        book.GenreId,
+			PublishDate:    book.PublishDate,
+			TotalAvailable: book.TotalAvailable,
 		},
 	}
 
-	const stmt = `INSERT INTO university.users (id,"user",password,first_name,last_name,email,role,created_by, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING active, is_deleted`
+	const stmt = `INSERT INTO university.books (id,title,author_id,genre_id,publish_date,total_available,created_by,created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING active, is_deleted`
 
 	db, errc := conn.GetConnection()
 	if errc != nil {
-		return nil, utils.DBConnectionError
+		return nil, errc //utils.DBConnectionError
 	}
 
 	var temps utils.Flags
-	err := db.QueryRow(stmt, e.Entity.ID, e.User.User, e.User.Password, e.User.FirstName, e.User.LastName, e.User.Email, e.User.Role, e.Entity.CreatedBy, e.Entity.CreatedAt).Scan(&temps.Active, &temps.IsDeleted)
+	err := db.QueryRow(stmt, e.Entity.ID, e.Book.Title, e.Book.AuthorId, e.Book.GenreId, e.Book.PublishDate, e.Book.TotalAvailable, e.Entity.CreatedBy, e.Entity.CreatedAt).Scan(&temps.Active, &temps.IsDeleted)
 	if err != nil {
 		db.Close()
-		return nil, utils.ErrCreatingRow
+		return nil, err //utils.ErrCreatingRow
 	}
 
 	db.Close()

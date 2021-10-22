@@ -2,23 +2,24 @@ package conn
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/lib/pq"
 	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
-// const (
-// 	host     = "localhost"
-// 	port     = 5432
-// 	user     = "postgres"
-// 	password = "root"
-// 	dbname   = "library"
-// )
+var (
+	host     = "localhost"
+	port     = 5432
+	user     = utils.GoDotEnvVariable("DBUSER")
+	password = utils.GoDotEnvVariable("DBPASS")
+	dbname   = "library"
+)
 
 func GetConnection() (*sql.DB, error) {
 
-	psCredentials := utils.GoDotEnvVariable("DB_CONNECTION_STRING")
-
+	psCredentials := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	fmt.Print(psCredentials)
 	db, err := sql.Open("postgres", psCredentials)
 
 	if err == nil {

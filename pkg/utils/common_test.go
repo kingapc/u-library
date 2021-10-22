@@ -6,12 +6,12 @@ import (
 )
 
 func TestGoDotEnvVariable(t *testing.T) {
-	item := "jdnfksdmfksd"
+	item := "postgres"
 	want := regexp.MustCompile(`\b` + item + `\b`)
-	msg := GoDotEnvVariable("ACCESS_SECRET")
+	msg := GoDotEnvVariable("DBUSER")
 
 	if !want.MatchString(msg) {
-		t.Fatalf(`GoDotEnvVariable("ACCESS_SECRET") = %q, want match for %#q`, msg, want)
+		t.Fatalf(`GoDotEnvVariable("DBUSER") = %q, want match for %#q`, msg, want)
 	}
 }
 

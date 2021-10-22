@@ -7,5 +7,5 @@ var (
 	EnvNotLoaded      = errors.New("Unable to load env")
 	EmtpyModel        = errors.New("Model is empty")
 	ErrCreatingRow    = errors.New("Unable to create the register")
-	DBConnectionError = erros.New("Unable to connect to the data base")
+	DBConnectionError = errors.New("Unable to connect to the data base")
 )
