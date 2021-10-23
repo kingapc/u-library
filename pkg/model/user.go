@@ -2,7 +2,7 @@ package model
 
 // User is the structure for an user
 type User struct {
-	User      string `json:"user"`
+	User      string `json:"user_name"`
 	Password  string `json:"password"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
@@ -11,9 +11,10 @@ type User struct {
 	Active    bool   `json:"active"`
 }
 
-// type MyUser struct {
-// 	ID string `json:"id"`
-// }
+type Credentials struct {
+	User     string `json:"user"`
+	Password string `json:"password"`
+}
 
 // UserEntity is the user entity for the database
 type UserEntity struct {

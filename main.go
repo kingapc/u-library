@@ -5,63 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	handler "github.com/rpinedafocus/u-library/pkg/handler"
+	security "github.com/rpinedafocus/u-library/pkg/middleware"
 )
-
-var (
-	router = gin.Default()
-	//client *redis.Client
-)
-
-// type Todo struct {
-// 	UserID       string `json:"user_id"`
-// 	Title        string `json:"title"`
-// 	Uu           string `json:"uuid"`
-// 	UserFromMeta string `json:"user_from"`
-// }
-
-// func GoDotEnvVariable(key string) string {
-// 	err := godotenv.Load(".env")
-
-// 	if err != nil {
-// 		return ""
-// 	}
-
-// 	return os.Getenv(key)
-// }
-
-// type AccessDetails struct {
-// 	AccessUuid  string
-// 	UserId      string
-// 	RefreshUuid string
-// }
-
-// type Credentials struct {
-// 	USER     string `json:"user"`
-// 	PASSWORD string `json:"password"`
-// }
-
-// type InfoLogin struct {
-// 	FULL_NAME string
-// 	USER_NAME string
-// 	ROLE_ID   int
-// }
-
-// type TokenDetails struct {
-// 	AccessToken  string
-// 	RefreshToken string
-// 	AccessUuid   string
-// 	RefreshUuid  string
-// 	AtExpires    int64
-// 	RtExpires    int64
-// }
-
-// var isLogin1 InfoLogin
-// var tokenD *TokenDetails
 
 /**********	MAIN	************/
 func main() {
 
-	router.GET("/books", handler.FetchAllBooksController)
+	var router = gin.Default()
+	security.Init()
+	router.POST("/login", handler.LoginController)
+	router.POST("/logout", security.TokenAuthMiddleware(), handler.LogoutController)
+
+	router.GET("/books", security.TokenAuthMiddleware(), handler.FetchAllBooksController)
 	router.POST("/books/create", handler.CreateBookController)
 	router.GET("/books/:id", handler.FetchBookByIdController)
 
@@ -76,8 +31,8 @@ func main() {
 	router.POST("/rent/create", handler.CreateRentController)
 	router.POST("/rent/return/:id", handler.ReturnRentedBookController)
 
-	router.GET("/common/mybooks", handler.FetchBookingRentBooks)     //User inquiry his books
-	router.GET("/common/mybooks/:id", handler.FetchBookingRentBooks) //admin inquiry the user's books
+	router.GET("/common/mybooks", security.TokenAuthMiddleware(), handler.FetchBookingRentBooks) //User inquiry his books
+	router.GET("/common/mybooks/:id", handler.FetchBookingRentBooks)                             //admin inquiry the user's books
 
 	//router.POST("/logins", Login)
 	// router.GET("/authors", getAuthors)
