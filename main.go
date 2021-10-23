@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	handler "github.com/rpinedafocus/u-library/pkg/handler"
@@ -62,13 +61,24 @@ var (
 /**********	MAIN	************/
 func main() {
 
-	router.POST("/user/create", CreateUser)
-	router.POST("/role/create", CreateRol)
-	router.POST("/genre/create", CreateGenre)
-	router.POST("/author/create", CreateAuthor)
-	router.POST("/book/create", CreateBook)
-	router.POST("/booking/create", CreateBooking)
-	router.POST("/rent/create", CreateRent)
+	router.GET("/books", handler.FetchAllBooksController)
+	router.POST("/books/create", handler.CreateBookController)
+	router.GET("/books/:id", handler.FetchBookByIdController)
+
+	router.POST("/bookings/create", handler.CreateBookingController)
+	router.POST("/bookings/release/:id", handler.ReleaseBookingController)
+
+	router.POST("/users/create", handler.CreateUserController)
+	router.POST("/roles/create", handler.CreateRoleController)
+	router.POST("/genres/create", handler.CreateGenreController)
+	router.POST("/authors/create", handler.CreateAuthorController)
+
+	router.POST("/rent/create", handler.CreateRentController)
+	router.POST("/rent/return/:id", handler.ReturnRentedBookController)
+
+	router.GET("/common/mybooks", handler.FetchBookingRentBooks)     //User inquiry his books
+	router.GET("/common/mybooks/:id", handler.FetchBookingRentBooks) //admin inquiry the user's books
+
 	//router.POST("/logins", Login)
 	// router.GET("/authors", getAuthors)
 	// router.GET("/books", getBooks)
@@ -95,75 +105,52 @@ func main() {
 	log.Fatal(router.Run("localhost:8080"))
 }
 
-func CreateUser(c *gin.Context) {
-	ent, response := handler.CreateUserController(c)
+// func EndPointFactory(c *gin.Context) {
 
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
+// 	type All struct {
+// 		a []*model.FetchBook
+// 		b *model.UserEntity
+// 	}
+// 	var ent All
+// 	var response string
+// 	var test All
+// 	endpoint := c.Request.URL.Path
 
-func CreateRol(c *gin.Context) {
-	ent, response := handler.CreateRolController(c)
+// 	fmt.Print(endpoint)
+// 	switch endpoint {
+// 	case "/books":
+// 		ent.a, response = handler.FetchAllBooksController(c)
+// 		test.a = ent.a
+// 		// case "/users/create":
+// 		// 	ent.b, response = handler.CreateUserController(c)
+// 	}
 
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
+// 	if response == "" {
+// 		c.IndentedJSON(http.StatusOK, test)
+// 	} else {
+// 		c.IndentedJSON(http.StatusBadRequest, response)
+// 	}
+// }
 
-func CreateGenre(c *gin.Context) {
-	ent, response := handler.CreateGenreController(c)
+// func CreateUser(c *gin.Context) {
+// 	ent, response := handler.CreateUserController(c)
 
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
+// 	if response == "" {
+// 		c.IndentedJSON(http.StatusOK, ent)
+// 	} else {
+// 		c.IndentedJSON(http.StatusBadRequest, response)
+// 	}
+// }
 
-func CreateAuthor(c *gin.Context) {
-	ent, response := handler.CreateAuthorController(c)
+// func CreateRol(c *gin.Context) {
+// 	ent, response := handler.CreateRolController(c)
 
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
-
-func CreateBook(c *gin.Context) {
-	ent, response := handler.CreateBookController(c)
-
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
-
-func CreateBooking(c *gin.Context) {
-	ent, response := handler.CreateBookingController(c)
-
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
-
-func CreateRent(c *gin.Context) {
-	ent, response := handler.CreateRentController(c)
-
-	if response == "" {
-		c.IndentedJSON(http.StatusOK, ent)
-	} else {
-		c.IndentedJSON(http.StatusBadRequest, response)
-	}
-}
+// 	if response == "" {
+// 		c.IndentedJSON(http.StatusOK, ent)
+// 	} else {
+// 		c.IndentedJSON(http.StatusBadRequest, response)
+// 	}
+// }
 
 /*********** END POINTS	***********/
 // func getAuthors(c *gin.Context) {

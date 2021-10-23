@@ -1,6 +1,5 @@
 package model
 
-// User is the structure for an user
 type Book struct {
 	Title          string `json:"title"`
 	AuthorId       int    `json:"author_id"`
@@ -12,7 +11,19 @@ type Book struct {
 	Active         bool   `json:"active"`
 }
 
-// UserEntity is the user entity for the database
+type FetchBook struct {
+	ID             string `json:"id"`
+	Title          string `json:"title"`
+	Author         string `json:"author"`
+	Genre          string `json:"genre"`
+	PublishDate    string `json:"publish_date"`
+	TotalAvailable int    `json:"total_available"`
+}
+
+// type MyBook struct {
+// 	ID string `json:"id"`
+// }
+
 type BookEntity struct {
 	Entity
 	Book

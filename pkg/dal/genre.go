@@ -32,7 +32,7 @@ func CreateGenre(genre *model.Genre) (*model.GenreEntity, error) {
 
 	db, errc := conn.GetConnection()
 	if errc != nil {
-		return nil, errc //utils.DBConnectionError
+		return nil, errc
 	}
 
 	var tempid int
@@ -40,7 +40,7 @@ func CreateGenre(genre *model.Genre) (*model.GenreEntity, error) {
 	err := db.QueryRow(stmt, e.Entity.ID, e.Genre.Name, e.Entity.CreatedBy, e.Entity.CreatedAt).Scan(&tempid, &temps.Active, &temps.IsDeleted)
 	if err != nil {
 		db.Close()
-		return nil, err // utils.ErrCreatingRow
+		return nil, err
 	}
 
 	db.Close()

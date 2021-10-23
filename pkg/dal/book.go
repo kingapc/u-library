@@ -1,6 +1,9 @@
 package dal
 
 import (
+	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 
 	conn "github.com/rpinedafocus/u-library/pkg/db"
@@ -36,14 +39,14 @@ func CreateBook(book *model.Book) (*model.BookEntity, error) {
 
 	db, errc := conn.GetConnection()
 	if errc != nil {
-		return nil, errc //utils.DBConnectionError
+		return nil, errc
 	}
 
 	var temps utils.Flags
 	err := db.QueryRow(stmt, e.Entity.ID, e.Book.Title, e.Book.AuthorId, e.Book.GenreId, e.Book.PublishDate, e.Book.TotalAvailable, e.Entity.CreatedBy, e.Entity.CreatedAt).Scan(&temps.Active, &temps.IsDeleted)
 	if err != nil {
 		db.Close()
-		return nil, err //utils.ErrCreatingRow
+		return nil, err
 	}
 
 	db.Close()
@@ -54,30 +57,93 @@ func CreateBook(book *model.Book) (*model.BookEntity, error) {
 	return e, nil
 }
 
-// func FetchAll() ([]*model.UserEntity, error) {
+func FetchAll(p string, v string) ([]*model.FetchBook, error) {
 
-// 	const stmt = `SELECT id, first_name, last_name, created_at, updated_at, deleted_at FROM user`
-// 	rows, err := u.DB.QueryContext(ctx, stmt)
-// 	switch {
-// 	case errors.Is(err, sql.ErrNoRows):
-// 		return nil, errorx.ErrNoUser
-// 	case err != nil:
-// 		return nil, fmt.Errorf("user fetch query %w", err)
-// 	default:
-// 	}
-// 	defer rows.Close()
+	var rows *sql.Rows
+	var err error
+	var condition string
 
-// 	entities := []*model.UserEntity{}
-// 	for rows.Next() {
-// 		e := &model.UserEntity{}
-// 		deletedAt := sql.NullTime{}
-// 		if err := rows.Scan(&e.ID, &e.FirstName, &e.LastName, &e.CreatedAt, &e.UpdatedAt, &deletedAt); err != nil {
-// 			return nil, fmt.Errorf("user row scan error %w", err)
-// 		}
-// 		if deletedAt.Valid == false {
-// 			entities = append(entities, e)
-// 		}
-// 	}
+	switch p {
+	case "title":
+		condition = `AND LOWER(b.title) like $1`
+	case "author":
+		condition = `AND LOWER(a.name) like $1`
+	case "genre":
+		condition = `AND LOWER(g.name) like $1`
+	default:
+		condition = ""
+	}
 
-// 	return entities, nil
-// }
+	var stmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
+					FROM university.books b
+					INNER JOIN university.authors a on a.author_id = b.author_id
+					INNER JOIN university.genres g on g.genre_id = b.genre_id
+					WHERE b.active = true AND b.is_deleted = 'N' ` + condition
+
+	db, errc := conn.GetConnection()
+	if errc != nil {
+		return nil, errc
+	}
+
+	if condition != "" {
+		rows, err = db.Query(stmt, `%`+v+`%`)
+	} else {
+		rows, err = db.Query(stmt)
+	}
+
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return nil, utils.ErrNoDataFoun
+	case err != nil:
+		return nil, fmt.Errorf((utils.FetchQueryC.Error() + "%w"), err)
+	default:
+	}
+	defer rows.Close()
+
+	entities := []*model.FetchBook{}
+	for rows.Next() {
+		e := &model.FetchBook{}
+		if err := rows.Scan(&e.ID, &e.Title, &e.Author, &e.Genre, &e.PublishDate, &e.TotalAvailable); err != nil {
+			return nil, fmt.Errorf("user row scan error %w", err)
+		}
+
+		entities = append(entities, e)
+	}
+
+	return entities, nil
+}
+
+func FetchBookById(id string) (*model.FetchBook, error) {
+
+	var stmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
+					FROM university.books b
+					INNER JOIN university.authors a on a.author_id = b.author_id
+					INNER JOIN university.genres g on g.genre_id = b.genre_id
+					WHERE b.active = true AND b.is_deleted = 'N' AND b.id = $1`
+
+	db, errc := conn.GetConnection()
+	if errc != nil {
+		return nil, errc
+	}
+
+	row := db.QueryRow(stmt, id)
+
+	switch {
+	case errors.Is(row.Err(), sql.ErrNoRows):
+		return nil, utils.ErrNoDataFoun
+	case row.Err() != nil:
+		return nil, fmt.Errorf((utils.FetchQueryC.Error() + "%w"), row.Err().Error())
+	default:
+	}
+
+	e := &model.FetchBook{}
+	err := row.Scan(&e.ID, &e.Title, &e.Author, &e.Genre, &e.PublishDate, &e.TotalAvailable)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return nil, utils.ErrNoDataFoun
+	case err != nil:
+		return nil, fmt.Errorf(utils.FetchQueryC.Error()+"%w", err)
+	default:
+		return e, nil
+	}
+}

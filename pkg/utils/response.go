@@ -1,33 +1,29 @@
 package utils
 
-func Success() string {
-	return "U-LIB - Operation was successful."
+func Success(message string) map[string]interface{} {
+
+	m := make(map[string]interface{})
+
+	m["status"] = "success"
+	m["message"] = message
+
+	return m
 }
 
-func ErrorX(code int) string {
+func ErrorX(httpDescription string, showDetail bool, detail string, isWarning bool) map[string]interface{} {
 
-	switch code {
-	case 400:
-		return "ULIB-000 - Bad request check body/params"
+	m := make(map[string]interface{})
 
-	case 401:
-		return "ULIB-001 - Authentication required"
-
-	case 402:
-		return "ULIB-002 - Payment required"
-
-	case 403:
-		return "ULIB-003 - Forbidden Action"
-
-	case 404:
-		return "ULIB-004 - Not found"
-
-	case 409:
-		return "ULIB-009 - Resource is already in use"
-
-	case 422:
-		return "ULIB-022 - Missing Access Header"
+	m["status"] = "Fail"
+	if isWarning {
+		m["status"] = "Warning"
 	}
 
-	return "ULIB-999 - Server Error"
+	m["message"] = httpDescription
+
+	if showDetail {
+		m["detail"] = detail
+	}
+
+	return m
 }

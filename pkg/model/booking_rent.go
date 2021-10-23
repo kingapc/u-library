@@ -1,6 +1,8 @@
 package model
 
-// User is the structure for an user
+import "database/sql"
+
+//basic structure
 type BookingRent struct {
 	BookId        string `json:"book_id"`
 	BookingRentBy string `json:"booking_rent_by"`
@@ -8,9 +10,22 @@ type BookingRent struct {
 	RentDate      string `json:"rent_date"`
 	ReturnDate    string `json:"return_date"`
 	Active        bool   `json:"active"`
+	Returned      bool   `json:"returned"`
 }
 
-// UserEntity is the user entity for the database
+type MyBookingRent struct {
+	ID            string         `json:"id"`
+	BookingRentBy string         `json:"booking_rent_by"`
+	BookId        string         `json:"book_id"`
+	Title         string         `json:"title"`
+	PublishDate   sql.NullString `json:"publish_date,omitempty"`
+	Author        string         `json:"author"`
+	Genre         string         `json:"genre"`
+	BookingDate   sql.NullString `json:"booking_date,omitempty"`
+	RentDate      sql.NullString `json:"rent_date,omitempty"`
+	Status        string         `json:"status"`
+}
+
 type BookingRentEntity struct {
 	Entity
 	BookingRent

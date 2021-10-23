@@ -11,6 +11,10 @@ type User struct {
 	Active    bool   `json:"active"`
 }
 
+// type MyUser struct {
+// 	ID string `json:"id"`
+// }
+
 // UserEntity is the user entity for the database
 type UserEntity struct {
 	Entity

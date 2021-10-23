@@ -1,173 +1,74 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/pkg/dal"
 	"github.com/rpinedafocus/u-library/pkg/model"
+	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
 // create handles the user create request
-func CreateBookController(c *gin.Context) (*model.BookEntity, string) {
+func CreateBookController(c *gin.Context) {
 
 	book := &model.Book{}
 
 	if err := c.BindJSON(&book); err != nil {
-		return nil, err.Error() //utils.ErrorX(400)
+		c.JSON(http.StatusBadRequest, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusBadRequest), true, err.Error(), false)})
+		return
 	}
 
 	entity, err := dal.CreateBook(book)
 	if err != nil {
-		return nil, err.Error() //utils.ErrorX(400)
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
+	} else {
+		c.JSON(http.StatusCreated, gin.H{"operation": utils.Success(http.StatusText(http.StatusCreated)), "response": entity})
 	}
-
-	return entity, ""
 }
 
-// fetchByID will return an user by its id
-// func (h *Handler) fetchByID() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		id := vars[userID]
-// 		entity, err := h.UserDAO.FetchByID(r.Context(), id)
-// 		switch {
-// 		case errors.Is(err, errorx.ErrNoUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s does not exist", id),
-// 			}
-// 			response.JSON(w, http.StatusNotFound, msg)
-// 			return
-// 		case errors.Is(err, errorx.ErrDeleteUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s has been deleted", id),
-// 			}
-// 			response.JSON(w, http.StatusGone, msg)
-// 			return
-// 		case err != nil:
-// 			msg := &errorMessage{
-// 				Error:   err.Error(),
-// 				Message: "user datastore error",
-// 			}
-// 			response.JSON(w, http.StatusInternalServerError, msg)
-// 			return
-// 		default:
-// 			response.JSON(w, http.StatusOK, entity)
-// 		}
+func FetchAllBooksController(c *gin.Context) {
 
-// 	}
-// }
+	a := []string{"title", "author", "genre"}
+	p, v := utils.ValidateParams(c, a)
 
-// // list will return all of the users
-// func (h *Handler) list() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		entities, err := h.UserDAO.FetchAll(r.Context())
-// 		switch {
-// 		case errors.Is(err, errorx.ErrNoUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("no users exist"),
-// 			}
-// 			response.JSON(w, http.StatusNotFound, msg)
-// 			return
-// 		case err != nil:
-// 			msg := &errorMessage{
-// 				Error:   err.Error(),
-// 				Message: "user datastore error",
-// 			}
-// 			response.JSON(w, http.StatusInternalServerError, msg)
-// 			return
-// 		default:
-// 			response.JSON(w, http.StatusOK, entities)
-// 		}
-// 	}
-// }
+	if p == "" || v == "" {
+		if !(c.Request.RequestURI == c.Request.URL.Path) {
+			c.JSON(http.StatusBadRequest, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusBadRequest), false, "", false)})
+			return
+		}
+	}
 
-// // update will return the updated user
-// func (h *Handler) update() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		user := &model.User{}
-// 		if err := json.NewDecoder(r.Body).Decode(user); err != nil {
-// 			msg := &errorMessage{
-// 				Error:   err.Error(),
-// 				Message: "user json decode error",
-// 			}
-// 			response.JSON(w, http.StatusBadRequest, msg)
-// 			return
-// 		}
-// 		if len(user.FirstName) == 0 && len(user.LastName) == 0 {
-// 			msg := &errorMessage{
-// 				Message: "user must have fields to update",
-// 			}
-// 			response.JSON(w, http.StatusBadRequest, msg)
-// 			return
-// 		}
+	entity, err := dal.FetchAll(p, v)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"operation": utils.Success(http.StatusText(http.StatusOK)), "response": entity})
+	}
+}
 
-// 		vars := mux.Vars(r)
-// 		id := vars[userID]
-// 		entity, err := h.UserDAO.Update(r.Context(), id, user)
-// 		switch {
-// 		case errors.Is(err, errorx.ErrNoUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s does not exist", id),
-// 			}
-// 			response.JSON(w, http.StatusNotFound, msg)
-// 			return
-// 		case errors.Is(err, errorx.ErrDeleteUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s has been deleted", id),
-// 			}
-// 			response.JSON(w, http.StatusGone, msg)
-// 			return
-// 		case err != nil:
-// 			msg := &errorMessage{
-// 				Error:   err.Error(),
-// 				Message: "user datastore error",
-// 			}
-// 			response.JSON(w, http.StatusInternalServerError, msg)
-// 			return
-// 		default:
-// 			response.JSON(w, http.StatusOK, entity)
-// 		}
+func FetchBookByIdController(c *gin.Context) {
 
-// 	}
-// }
+	req, resul := utils.IsValidUUID(c.Params.ByName("id"))
+	if !resul {
+		c.JSON(http.StatusBadRequest, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusBadRequest), true, utils.InvalidId.Error(), false)})
+		return
+	}
 
-// // delete will remove the user
-// func (h *Handler) delete() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		id := vars[userID]
-// 		err := h.UserDAO.Delete(r.Context(), id)
-// 		switch {
-// 		case errors.Is(err, errorx.ErrNoUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s does not exist", id),
-// 			}
-// 			response.JSON(w, http.StatusNotFound, msg)
-// 			return
-// 		case errors.Is(err, errorx.ErrDeleteUser):
-// 			msg := &errorMessage{
-// 				Message: fmt.Sprintf("user %s has been deleted", id),
-// 			}
-// 			response.JSON(w, http.StatusGone, msg)
-// 			return
-// 		case err != nil:
-// 			msg := &errorMessage{
-// 				Error:   err.Error(),
-// 				Message: "user datastore error",
-// 			}
-// 			response.JSON(w, http.StatusInternalServerError, msg)
-// 			return
-// 		default:
-// 			response.JSON(w, http.StatusNoContent, nil)
-// 		}
-// 	}
+	entity, err := dal.FetchBookById(req)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"operation": utils.Success(http.StatusText(http.StatusOK)), "response": entity})
+	}
+}
 
-// }
+func IsBookAvailableController(id string) int {
 
-// Add will configure the routes for user operations
-// func (h *Handler) Add(router *mux.Router) {
-// 	router.Methods(http.MethodPost).Path("/user").Handler(h.create()).Name("user-create")
-// 	router.Methods(http.MethodGet).Path(fmt.Sprintf("/users/{%s}", userID)).Handler(h.fetchByID()).Name("user-fetch")
-// 	router.Methods(http.MethodGet).Path("/users").Handler(h.list()).Name("user-fetch-all")
-// 	router.Methods(http.MethodPatch).Path(fmt.Sprintf("/users/{%s}", userID)).Handler(h.update()).Name("user-update")
-// 	router.Methods(http.MethodDelete).Path(fmt.Sprintf("/users/{%s}", userID)).Handler(h.delete()).Name("user-delete")
-// }
+	entity, err := dal.FetchBookById(id)
+	if err != nil {
+		return 0
+	} else {
+		return entity.TotalAvailable
+	}
+}

@@ -1,6 +1,8 @@
 package dal
 
 import (
+	"database/sql"
+	"errors"
 	"time"
 
 	conn "github.com/rpinedafocus/u-library/pkg/db"
@@ -52,30 +54,64 @@ func CreateRent(rent *model.BookingRent) (*model.BookingRentEntity, error) {
 	return e, nil
 }
 
-// func FetchAll() ([]*model.UserEntity, error) {
+func ReturnRentedBook(id string) (*model.BookingRentEntity, error) {
 
-// 	const stmt = `SELECT id, first_name, last_name, created_at, updated_at, deleted_at FROM user`
-// 	rows, err := u.DB.QueryContext(ctx, stmt)
-// 	switch {
-// 	case errors.Is(err, sql.ErrNoRows):
-// 		return nil, errorx.ErrNoUser
-// 	case err != nil:
-// 		return nil, fmt.Errorf("user fetch query %w", err)
-// 	default:
-// 	}
-// 	defer rows.Close()
+	now := time.Now()
 
-// 	entities := []*model.UserEntity{}
-// 	for rows.Next() {
-// 		e := &model.UserEntity{}
-// 		deletedAt := sql.NullTime{}
-// 		if err := rows.Scan(&e.ID, &e.FirstName, &e.LastName, &e.CreatedAt, &e.UpdatedAt, &deletedAt); err != nil {
-// 			return nil, fmt.Errorf("user row scan error %w", err)
-// 		}
-// 		if deletedAt.Valid == false {
-// 			entities = append(entities, e)
-// 		}
-// 	}
+	e := &model.BookingRentEntity{
+		Entity: model.Entity{
+			ID:        id,
+			UpdatedBy: "root",
+			UpdatedAt: now.Format("01-02-2006"),
+		},
+		BookingRent: model.BookingRent{
+			ReturnDate: now.Format("01-02-2006"),
+		},
+	}
 
-// 	return entities, nil
-// }
+	const stmt = `UPDATE UNIVERSITY.BOOKING_RENT SET return_date = $1, updated_by = $2, updated_at = $3, returned = true WHERE RENT_DATE IS NOT NULL AND id = $4 
+					RETURNING book_id,booking_rent_by,rent_date, returned, active`
+
+	db, errc := conn.GetConnection()
+	if errc != nil {
+		return nil, errc
+	}
+
+	temp := &model.BookingRent{}
+	err := db.QueryRow(stmt, e.BookingRent.ReturnDate, e.Entity.UpdatedBy, e.Entity.UpdatedAt, id).Scan(&temp.BookId, &temp.BookingRentBy, &temp.RentDate, &temp.Returned, &temp.Active)
+
+	if err != nil {
+		db.Close()
+		return nil, err
+	}
+
+	db.Close()
+
+	e.BookId = temp.BookId
+	e.BookingRentBy = temp.BookingRentBy
+	e.RentDate = temp.RentDate
+	e.Returned = temp.Returned
+	e.Active = temp.Active
+
+	return e, nil
+}
+
+func IsValidRent(id string) (bool, error) {
+
+	const stmt = `SELECT 'X' FROM UNIVERSITY.BOOKING_RENT WHERE RENT_DATE IS NOT NULL AND ACTIVE = true AND IS_DELETED = 'N' AND RETURNED = false AND ID = $1`
+
+	db, errc := conn.GetConnection()
+	if errc != nil {
+		return false, errc
+	}
+
+	var result string
+	err := db.QueryRow(stmt, id).Scan(&result)
+	if err != nil && !(errors.Is(err, sql.ErrNoRows)) {
+		db.Close()
+		return false, err
+	}
+	db.Close()
+
+	return (result == "X"), nil
+}

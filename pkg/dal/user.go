@@ -54,31 +54,3 @@ func CreateUser(user *model.User) (*model.UserEntity, error) {
 
 	return e, nil
 }
-
-// func FetchAll() ([]*model.UserEntity, error) {
-
-// 	const stmt = `SELECT id, first_name, last_name, created_at, updated_at, deleted_at FROM user`
-// 	rows, err := u.DB.QueryContext(ctx, stmt)
-// 	switch {
-// 	case errors.Is(err, sql.ErrNoRows):
-// 		return nil, errorx.ErrNoUser
-// 	case err != nil:
-// 		return nil, fmt.Errorf("user fetch query %w", err)
-// 	default:
-// 	}
-// 	defer rows.Close()
-
-// 	entities := []*model.UserEntity{}
-// 	for rows.Next() {
-// 		e := &model.UserEntity{}
-// 		deletedAt := sql.NullTime{}
-// 		if err := rows.Scan(&e.ID, &e.FirstName, &e.LastName, &e.CreatedAt, &e.UpdatedAt, &deletedAt); err != nil {
-// 			return nil, fmt.Errorf("user row scan error %w", err)
-// 		}
-// 		if deletedAt.Valid == false {
-// 			entities = append(entities, e)
-// 		}
-// 	}
-
-// 	return entities, nil
-// }
