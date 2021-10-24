@@ -1,7 +1,6 @@
 package securitty
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -9,14 +8,14 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/rpinedafocus/u-library/pkg/model"
+	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
-func TokenAuthMiddleware() gin.HandlerFunc {
+func ValidateTokenSession() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t, err := TokenValid(c.Request)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, err.Error())
+			c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), false, err.Error(), false)})
 			c.Abort()
 			return
 		}
@@ -25,18 +24,35 @@ func TokenAuthMiddleware() gin.HandlerFunc {
 		if ok && t.Valid {
 			uuidValue, ok := claims["access_uuid"].(string)
 			if !ok {
-				c.JSON(http.StatusUnprocessableEntity, err)
+				c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), false, err.Error(), false)})
 				c.Abort()
 				return
 			}
 
 			err := ValidateSession(uuidValue)
 			if err != nil {
-				c.JSON(http.StatusUnauthorized, "Invalid Session Test")
+				c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), false, err.Error(), false)})
 				c.Abort()
 				return
 			}
 		}
+
+		//Gettin the information
+		e, err := ExtractTokenMetadata(c.Request)
+		if err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), false, err.Error(), false)})
+			c.Abort()
+			return
+		}
+
+		myData := map[string]interface{}{
+			"uuid":   e.AccessUuid,
+			"myId":   e.MyId,
+			"userId": e.UserId,
+			"roleId": e.RoleId,
+		}
+
+		c.Set("MyInformation", myData)
 		c.Next()
 	}
 }
@@ -61,7 +77,7 @@ func VerifyToken(r *http.Request) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf(utils.ErrSingMethod.Error()+" %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("ACCESS_SECRET")), nil
 	})
@@ -89,58 +105,6 @@ func ValidateSession(uuid string) error {
 
 	if err != nil {
 		return err
-	}
-
-	return nil
-}
-
-/************ LOGOUT	*******************/
-func ExtractTokenMetadata(r *http.Request) (*model.AccessDetails, error) {
-
-	token, err := VerifyToken(r)
-	if err != nil {
-		return nil, err
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if ok && token.Valid {
-		accessUuid, ok := claims["access_uuid"].(string)
-		if !ok {
-			return nil, err
-		}
-
-		fmt.Print(claims)
-
-		userId := claims["user_id"].(string)
-		//refresh := claims["refresh_uuid"].(string)
-
-		return &model.AccessDetails{
-			AccessUuid: accessUuid,
-			UserId:     userId,
-			//RefreshUuid: refresh,
-		}, nil
-	}
-
-	return nil, err
-}
-
-func DeleteTokens(access string) error {
-
-	//delete access token
-	deletedAt, err := Client.Del(access).Result()
-	if err != nil {
-		return err
-	}
-
-	//delete refresh token
-	// deletedRt, err := Client.Del(refresh).Result()
-	// if err != nil {
-	// 	return err
-	// }
-
-	//When the record is deleted, the return value is 1
-	if deletedAt != 1 {
-		return errors.New("something went wrong")
 	}
 
 	return nil

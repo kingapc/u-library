@@ -16,7 +16,7 @@ func LogoutController(c *gin.Context) {
 	}
 
 	if metadata != nil {
-		delErr := security.DeleteTokens(metadata.AccessUuid)
+		delErr := security.DestroySession(metadata.AccessUuid)
 		if delErr != nil {
 			c.JSON(http.StatusUnauthorized, delErr.Error())
 			return

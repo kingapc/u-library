@@ -24,13 +24,13 @@ func LoginController(c *gin.Context) {
 		return
 	}
 
-	tok, err := security.CreateToken(e.Entity.ID, e.User.User)
+	tok, err := security.CreateToken(e.Entity.ID, e.User.User, e.User.Role)
 	if err != nil {
 		c.JSON(http.StatusNonAuthoritativeInfo, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusNonAuthoritativeInfo), true, err.Error(), false)})
 		return
 	}
 
-	saveErr := security.CreateAuth(e.Entity.ID, tok)
+	saveErr := security.CreateSession(e.Entity.ID, tok)
 	if saveErr != nil {
 		c.JSON(http.StatusUnprocessableEntity, err.Error())
 	}

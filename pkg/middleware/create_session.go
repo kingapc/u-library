@@ -6,7 +6,7 @@ import (
 	"github.com/rpinedafocus/u-library/pkg/model"
 )
 
-func CreateAuth(id string, td *model.TokenDetails) error {
+func CreateSession(id string, td *model.TokenDetails) error {
 
 	at := time.Unix(td.AtExpires, 0)
 	//rt := time.Unix(td.RtExpires, 0)

@@ -10,7 +10,8 @@ type TokenDetails struct {
 }
 
 type AccessDetails struct {
-	AccessUuid string
-	UserId     string
-	//RefreshUuid string
+	AccessUuid string `json:"accessuuid"`
+	UserId     string `json:"userid"`
+	MyId       string `json:"myid"`
+	RoleId     string `json:"role_id"`
 }

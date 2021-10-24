@@ -33,7 +33,7 @@ func CreateUser(user *model.User) (*model.UserEntity, error) {
 		},
 	}
 
-	const stmt = `INSERT INTO university.users (id,"user",password,first_name,last_name,email,role,created_by, created_at) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING active, is_deleted`
+	const stmt = `INSERT INTO university.users (id,"user",password,first_name,last_name,email,role,created_by, created_at) VALUES($1,$2,crypt($3, gen_salt('bf')),$4,$5,$6,$7,$8,$9) RETURNING active, is_deleted`
 
 	db, errc := conn.GetConnection()
 	if errc != nil {

@@ -1,6 +1,8 @@
 package securitty
 
 import (
+	"strconv"
+
 	"github.com/dgrijalva/jwt-go"
 	"github.com/rpinedafocus/u-library/pkg/model"
 	"github.com/rpinedafocus/u-library/pkg/utils"
@@ -10,12 +12,12 @@ import (
 	"time"
 )
 
-func CreateToken(id string, user string) (*model.TokenDetails, error) {
+func CreateToken(id string, user string, role int) (*model.TokenDetails, error) {
 
 	td := &model.TokenDetails{}
 
 	//Add expire time and random uuid
-	td.AtExpires = time.Now().Add(time.Minute * 1).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
 	td.AccessUuid = uuid.NewV4().String()
 
 	//td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
@@ -27,9 +29,11 @@ func CreateToken(id string, user string) (*model.TokenDetails, error) {
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
 	atClaims["access_uuid"] = td.AccessUuid
-	//atClaims["id"] = id
+	atClaims["id"] = id
 	atClaims["user_id"] = user
 	atClaims["exp"] = td.AtExpires
+	atClaims["role_id"] = strconv.Itoa(role)
+	//atClaims["role_id"] = role
 
 	//Creating token
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
