@@ -20,10 +20,6 @@ type FetchBook struct {
 	TotalAvailable int    `json:"total_available"`
 }
 
-// type MyBook struct {
-// 	ID string `json:"id"`
-// }
-
 type BookEntity struct {
 	Entity
 	Book

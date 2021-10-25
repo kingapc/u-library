@@ -12,7 +12,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
-func CreateBook(book *model.Book) (*model.BookEntity, error) {
+func CreateBook(user string, book *model.Book) (*model.BookEntity, error) {
 
 	if book == nil {
 		return nil, utils.EmtpyModel
@@ -23,7 +23,7 @@ func CreateBook(book *model.Book) (*model.BookEntity, error) {
 	e := &model.BookEntity{
 		Entity: model.Entity{
 			ID:        utils.RemoveHyphens(uuid.NewV4().String()),
-			CreatedBy: "root",
+			CreatedBy: user,
 			CreatedAt: now.Format("01-02-2006"),
 		},
 		Book: model.Book{

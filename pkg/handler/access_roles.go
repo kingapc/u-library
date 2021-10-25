@@ -5,12 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/pkg/dal"
+	security "github.com/rpinedafocus/u-library/pkg/middleware"
 	"github.com/rpinedafocus/u-library/pkg/model"
 	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
-// create handles the user create request
 func CreateAccessRolesController(c *gin.Context) {
+
+	mySession := security.GetSessionDetail(c)
+	if mySession == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), true, utils.ErrNoSessionInformation.Error(), false)})
+		return
+	}
 
 	accrol := &model.AccessRole{}
 
@@ -19,20 +25,10 @@ func CreateAccessRolesController(c *gin.Context) {
 		return
 	}
 
-	entity, err := dal.CreateAccessRole(accrol)
+	entity, err := dal.CreateAccessRole(mySession.UserId, accrol)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
 	} else {
 		c.JSON(http.StatusCreated, gin.H{"operation": utils.Success(http.StatusText(http.StatusCreated)), "response": entity})
 	}
 }
-
-// func FetchExistAccessRole(roleId int, endpoint string) (bool, error) {
-
-// 	result, err := dal.FetchAccessRolById(roleId, endpoint)
-// 	if err != nil {
-// 		return false, err
-// 	} else {
-// 		return result, nil
-// 	}
-// }

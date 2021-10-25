@@ -9,7 +9,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
-func CreateGenre(genre *model.Genre) (*model.GenreEntity, error) {
+func CreateGenre(user string, genre *model.Genre) (*model.GenreEntity, error) {
 
 	if genre == nil {
 		return nil, utils.EmtpyModel
@@ -20,7 +20,7 @@ func CreateGenre(genre *model.Genre) (*model.GenreEntity, error) {
 	e := &model.GenreEntity{
 		Entity: model.Entity{
 			ID:        utils.RemoveHyphens(uuid.NewV4().String()),
-			CreatedBy: "root",
+			CreatedBy: user,
 			CreatedAt: now.Format("01-02-2006"),
 		},
 		Genre: model.Genre{

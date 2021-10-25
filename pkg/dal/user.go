@@ -9,7 +9,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
-func CreateUser(user *model.User) (*model.UserEntity, error) {
+func CreateUser(userId string, user *model.User) (*model.UserEntity, error) {
 
 	if user == nil {
 		return nil, utils.EmtpyModel
@@ -20,7 +20,7 @@ func CreateUser(user *model.User) (*model.UserEntity, error) {
 	e := &model.UserEntity{
 		Entity: model.Entity{
 			ID:        utils.RemoveHyphens(uuid.NewV4().String()),
-			CreatedBy: "root",
+			CreatedBy: userId,
 			CreatedAt: now.Format("01-02-2006"),
 		},
 		User: model.User{
@@ -33,7 +33,7 @@ func CreateUser(user *model.User) (*model.UserEntity, error) {
 		},
 	}
 
-	const stmt = `INSERT INTO university.users (id,"user",password,first_name,last_name,email,role,created_by, created_at) VALUES($1,$2,crypt($3, gen_salt('bf')),$4,$5,$6,$7,$8,$9) RETURNING active, is_deleted`
+	const stmt = `INSERT INTO university.users (id,user_name,pwd,first_name,last_name,email,role,created_by,created_at) VALUES($1,$2,crypt($3, gen_salt('bf')),$4,$5,$6,$7,$8,$9) RETURNING active, is_deleted`
 
 	db, errc := conn.GetConnection()
 	if errc != nil {

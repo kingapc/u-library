@@ -9,7 +9,7 @@ import (
 	"github.com/twinj/uuid"
 )
 
-func CreateAuthor(author *model.Author) (*model.AuthorEntity, error) {
+func CreateAuthor(user string, author *model.Author) (*model.AuthorEntity, error) {
 
 	if author == nil {
 		return nil, utils.EmtpyModel
@@ -20,7 +20,7 @@ func CreateAuthor(author *model.Author) (*model.AuthorEntity, error) {
 	e := &model.AuthorEntity{
 		Entity: model.Entity{
 			ID:        utils.RemoveHyphens(uuid.NewV4().String()),
-			CreatedBy: "root",
+			CreatedBy: user,
 			CreatedAt: now.Format("01-02-2006"),
 		},
 		Author: model.Author{

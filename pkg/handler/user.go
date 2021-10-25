@@ -5,12 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/pkg/dal"
+	security "github.com/rpinedafocus/u-library/pkg/middleware"
 	"github.com/rpinedafocus/u-library/pkg/model"
 	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
-// create handles the user create request
 func CreateUserController(c *gin.Context) {
+
+	mySession := security.GetSessionDetail(c)
+	if mySession == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), true, utils.ErrNoSessionInformation.Error(), false)})
+		return
+	}
 
 	user := &model.User{}
 
@@ -19,14 +25,7 @@ func CreateUserController(c *gin.Context) {
 		return
 	}
 
-	temppw, err := utils.HashPassword(user.Password)
-	if err != nil {
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusMethodNotAllowed), true, err.Error(), false)})
-		return
-	}
-	user.Password = temppw
-
-	entity, err := dal.CreateUser(user)
+	entity, err := dal.CreateUser(mySession.UserId, user)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
 	} else {

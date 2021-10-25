@@ -21,7 +21,7 @@ func TestCreateRole(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateRole(tt.args.role)
+			got, err := CreateRole("root", tt.args.role)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateRole() error = %v, wantErr %v", err, tt.wantErr)
 				return

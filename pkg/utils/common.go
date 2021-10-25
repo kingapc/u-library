@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/twinj/uuid"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type Flags struct {
@@ -28,16 +27,6 @@ func GoDotEnvVariable(key string) string {
 	}
 
 	return os.Getenv(key)
-}
-
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
-}
-
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
 }
 
 func RemoveHyphens(ui string) string {

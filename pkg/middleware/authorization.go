@@ -69,14 +69,14 @@ func ValidateAccess() gin.HandlerFunc {
 		}
 
 		//Assingning the values
-		accessDetail := &model.AccessDetails{}
-		accessDetail.AccessUuid = b["uuid"].(string)
-		accessDetail.MyId = b["myId"].(string)
-		accessDetail.UserId = b["userId"].(string)
-		accessDetail.RoleId = b["roleId"].(string)
+		e := &model.AccessDetails{}
+		e.AccessUuid = b["uuid"].(string)
+		e.MyId = b["myId"].(string)
+		e.UserId = b["userId"].(string)
+		e.RoleId = b["roleId"].(string)
 
-		//Is necesary the cast to int
-		tempId, err := strconv.Atoi(accessDetail.RoleId)
+		//Is necessary to cast to int
+		tempId, err := strconv.Atoi(e.RoleId)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusBadRequest), true, utils.EmtpyModel.Error(), false)})
 			c.Abort()
@@ -84,14 +84,45 @@ func ValidateAccess() gin.HandlerFunc {
 		}
 
 		//Validate Access()
-		rest := dal.FetchAccessRolById(tempId, c.Request.URL.Path)
-
-		if rest {
+		rest := dal.FetchAccessRolById(tempId, c.FullPath())
+		if !rest {
 			c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), false, "", false)})
 			c.Abort()
 			return
 		}
 
+		myData := map[string]interface{}{
+			"uuid":   e.AccessUuid,
+			"myId":   e.MyId,
+			"userId": e.UserId,
+			"roleId": e.RoleId,
+		}
+
+		c.Set("myData", myData)
 		c.Next()
 	}
+}
+
+func GetSessionDetail(c *gin.Context) *model.AccessDetails {
+
+	//Get the information
+	data, ok := c.Get("myData")
+	if !ok {
+		return nil
+	}
+
+	//Validate the map
+	mapData, ok := data.(map[string]interface{})
+	if !ok {
+		return nil
+	}
+
+	//Assingning the values
+	e := &model.AccessDetails{}
+	e.AccessUuid = mapData["uuid"].(string)
+	e.MyId = mapData["myId"].(string)
+	e.UserId = mapData["userId"].(string)
+	e.RoleId = mapData["roleId"].(string)
+
+	return e
 }

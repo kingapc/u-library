@@ -5,12 +5,18 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/pkg/dal"
+	security "github.com/rpinedafocus/u-library/pkg/middleware"
 	"github.com/rpinedafocus/u-library/pkg/model"
 	"github.com/rpinedafocus/u-library/pkg/utils"
 )
 
-// create handles the user create request
 func CreateBookController(c *gin.Context) {
+
+	mySession := security.GetSessionDetail(c)
+	if mySession == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnauthorized), true, utils.ErrNoSessionInformation.Error(), false)})
+		return
+	}
 
 	book := &model.Book{}
 
@@ -19,7 +25,7 @@ func CreateBookController(c *gin.Context) {
 		return
 	}
 
-	entity, err := dal.CreateBook(book)
+	entity, err := dal.CreateBook(mySession.UserId, book)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"operation": utils.ErrorX(http.StatusText(http.StatusUnprocessableEntity), true, err.Error(), false)})
 	} else {

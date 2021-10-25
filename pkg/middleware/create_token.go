@@ -17,11 +17,8 @@ func CreateToken(id string, user string, role int) (*model.TokenDetails, error) 
 	td := &model.TokenDetails{}
 
 	//Add expire time and random uuid
-	td.AtExpires = time.Now().Add(time.Minute * 15).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 1).Unix()
 	td.AccessUuid = uuid.NewV4().String()
-
-	//td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	// td.RefreshUuid = uuid.NewV4().String()
 
 	//Adding the info
 	var err error
@@ -33,7 +30,6 @@ func CreateToken(id string, user string, role int) (*model.TokenDetails, error) 
 	atClaims["user_id"] = user
 	atClaims["exp"] = td.AtExpires
 	atClaims["role_id"] = strconv.Itoa(role)
-	//atClaims["role_id"] = role
 
 	//Creating token
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
@@ -41,18 +37,6 @@ func CreateToken(id string, user string, role int) (*model.TokenDetails, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	//Refreh Token
-	// os.Setenv("REFRESH_SECRET", utils.GoDotEnvVariable("REFRESH_SECRET"))
-	// rtClaims := jwt.MapClaims{}
-	// rtClaims["refresh_uuid"] = td.RefreshUuid
-	// //atClaims["id"] = id
-	// atClaims["user_id"] = user
-	// rtClaims["exp"] = td.RtExpires
-
-	//Creating token
-	// rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
-	// td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 
 	if err != nil {
 		return nil, err
