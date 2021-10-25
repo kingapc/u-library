@@ -17,7 +17,7 @@ func CreateToken(id string, user string, role int) (*model.TokenDetails, error) 
 	td := &model.TokenDetails{}
 
 	//Add expire time and random uuid
-	td.AtExpires = time.Now().Add(time.Minute * 30).Unix()
+	td.AtExpires = time.Now().Add(time.Minute * 1).Unix()
 	td.AccessUuid = uuid.NewV4().String()
 
 	//Adding the info
