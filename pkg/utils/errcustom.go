@@ -12,6 +12,7 @@ var (
 	FetchQueryC                   = errors.New("Error fetching data")
 	InvalidId                     = errors.New("Invalid Id")
 	RowScanError                  = errors.New("Row scan error")
+	ErrStmt                       = errors.New("Error in the statement")
 	ErrSingMethod                 = errors.New("unexpected signing method")
 	ErrDeleteSession              = errors.New("Unable to delete session")
 	ErrRoleIdIinvalid             = errors.New("Invalid Role Id")

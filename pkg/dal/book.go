@@ -74,7 +74,7 @@ func FetchAll(p string, v string) ([]*model.FetchBook, error) {
 		condition = ""
 	}
 
-	var stmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
+	var sqlStmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
 					FROM university.books b
 					INNER JOIN university.authors a on a.author_id = b.author_id
 					INNER JOIN university.genres g on g.genre_id = b.genre_id
@@ -85,10 +85,15 @@ func FetchAll(p string, v string) ([]*model.FetchBook, error) {
 		return nil, errc
 	}
 
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
+
 	if condition != "" {
-		rows, err = db.Query(stmt, `%`+v+`%`)
+		rows, err = stmt.Query(`%` + v + `%`)
 	} else {
-		rows, err = db.Query(stmt)
+		rows, err = stmt.Query()
 	}
 
 	switch {
@@ -104,7 +109,7 @@ func FetchAll(p string, v string) ([]*model.FetchBook, error) {
 	for rows.Next() {
 		e := &model.FetchBook{}
 		if err := rows.Scan(&e.ID, &e.Title, &e.Author, &e.Genre, &e.PublishDate, &e.TotalAvailable); err != nil {
-			return nil, fmt.Errorf("user row scan error %w", err)
+			return nil, fmt.Errorf(utils.FetchQueryC.Error()+"%w", err)
 		}
 
 		entities = append(entities, e)
@@ -115,7 +120,7 @@ func FetchAll(p string, v string) ([]*model.FetchBook, error) {
 
 func FetchBookById(id string) (*model.FetchBook, error) {
 
-	var stmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
+	var sqlStmt = `SELECT b.id, b.title, a.name author, g.name genre, b.publish_date, b.total_available 
 					FROM university.books b
 					INNER JOIN university.authors a on a.author_id = b.author_id
 					INNER JOIN university.genres g on g.genre_id = b.genre_id
@@ -126,7 +131,12 @@ func FetchBookById(id string) (*model.FetchBook, error) {
 		return nil, errc
 	}
 
-	row := db.QueryRow(stmt, id)
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
+
+	row := stmt.QueryRow(id)
 
 	switch {
 	case errors.Is(row.Err(), sql.ErrNoRows):
@@ -137,7 +147,7 @@ func FetchBookById(id string) (*model.FetchBook, error) {
 	}
 
 	e := &model.FetchBook{}
-	err := row.Scan(&e.ID, &e.Title, &e.Author, &e.Genre, &e.PublishDate, &e.TotalAvailable)
+	err = row.Scan(&e.ID, &e.Title, &e.Author, &e.Genre, &e.PublishDate, &e.TotalAvailable)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return nil, utils.ErrNoDataFoun

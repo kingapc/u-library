@@ -12,15 +12,20 @@ import (
 
 func Login(user string, password string) (*model.UserEntity, error) {
 
+	const sqlStmt = ` SELECT id, user_name, first_name, last_name, email, role, active FROM UNIVERSITY.users where user_name = $1 and pwd = crypt($2, pwd)`
+
 	db, err := conn.GetConnection()
 	if err != nil {
 		return nil, err
 	}
 
-	const stmt = ` SELECT id, user_name, first_name, last_name, email, role, active FROM UNIVERSITY.users where user_name = $1 and pwd = crypt($2, pwd)`
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
 
 	e := &model.UserEntity{}
-	err = db.QueryRow(stmt, user, password).Scan(&e.ID, &e.User.User, &e.FirstName, &e.LastName, &e.Email, &e.Role, &e.Active)
+	err = stmt.QueryRow(user, password).Scan(&e.ID, &e.User.User, &e.FirstName, &e.LastName, &e.Email, &e.Role, &e.Active)
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):

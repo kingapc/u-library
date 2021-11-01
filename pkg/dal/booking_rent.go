@@ -102,7 +102,7 @@ func ReleaseBookingRent(user string, id string) (*model.BookingRentEntity, error
 
 func FetchBookingRent(id string) ([]*model.MyBookingRent, error) {
 
-	var stmt = `SELECT a.id ID, a.process_by, a.book_id BOOK_ID, b.title TITLE, b.publish_date PUBLISH_DATE, c.name AUTHOR, d.name GENRE, a.process_date,
+	var sqlStmt = `SELECT a.id ID, a.process_by, a.book_id BOOK_ID, b.title TITLE, b.publish_date PUBLISH_DATE, c.name AUTHOR, d.name GENRE, a.process_date,
 				CASE WHEN a.is_booking IS NULL THEN 'booked' ELSE 'rented' END STATUS
 				FROM university.BOOKING_RENT a 
 				INNER JOIN university.books b ON a.book_id = b.id 
@@ -115,7 +115,12 @@ func FetchBookingRent(id string) ([]*model.MyBookingRent, error) {
 		return nil, errc
 	}
 
-	rows, err := db.Query(stmt, id)
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return nil, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
+
+	rows, err := stmt.Query(id)
 
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
@@ -140,36 +145,9 @@ func FetchBookingRent(id string) ([]*model.MyBookingRent, error) {
 	return entities, nil
 }
 
-// func ExistValidRent(bookId string, rentBy string) (bool, error) {
-
-// 	const stmt = `SELECT 'X' FROM UNIVERSITY.BOOKING_RENT
-// 					WHERE RENT_DATE IS NOT NULL
-// 					AND RETURN_DATE IS NULL
-// 					AND ACTIVE = true
-// 					AND RETURNED = false
-// 					AND IS_DELETED = 'N'
-// 					AND BOOK_ID = $1
-// 					AND BOOKING_RENT_BY = $2`
-
-// 	db, err := conn.GetConnection()
-// 	if err != nil {
-// 		return false, err
-// 	}
-
-// 	var result string
-// 	err = db.QueryRow(stmt, bookId, rentBy).Scan(&result)
-// 	if err != nil && !(errors.Is(err, sql.ErrNoRows)) {
-// 		db.Close()
-// 		return false, err
-// 	}
-// 	db.Close()
-
-// 	return (result == "X"), nil
-// }
-
 func ExistValidBookingRent(bookId string, processBy string) (bool, error) {
 
-	const stmt = `SELECT 'X' 
+	const sqlStmt = `SELECT 'X' 
 					FROM UNIVERSITY.BOOKING_RENT
 					WHERE 
 						RETURN_DATE IS NULL
@@ -183,7 +161,13 @@ func ExistValidBookingRent(bookId string, processBy string) (bool, error) {
 	}
 
 	var result string
-	err = db.QueryRow(stmt, bookId, processBy).Scan(&result)
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return false, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
+
+	err = stmt.QueryRow(bookId, processBy).Scan(&result)
+
 	if err != nil && !(errors.Is(err, sql.ErrNoRows)) {
 		db.Close()
 		return false, err
@@ -195,7 +179,7 @@ func ExistValidBookingRent(bookId string, processBy string) (bool, error) {
 
 func IsValidBookingRent(id string) (bool, error) {
 
-	const stmt = `SELECT 'X' FROM UNIVERSITY.BOOKING_RENT WHERE RETURN_DATE IS NOT NULL AND IS_DELETED = 'N' AND ID = $1`
+	const sqlStmt = `SELECT 'X' FROM UNIVERSITY.BOOKING_RENT WHERE RETURN_DATE IS NOT NULL AND IS_DELETED = 'N' AND ID = $1`
 
 	db, errc := conn.GetConnection()
 	if errc != nil {
@@ -203,8 +187,12 @@ func IsValidBookingRent(id string) (bool, error) {
 	}
 
 	var result string
+	stmt, err := db.Prepare(sqlStmt)
+	if err != nil {
+		return false, fmt.Errorf((utils.ErrStmt.Error() + "%w"), err)
+	}
 
-	if db.QueryRow(stmt, id).Scan(&result); errc != nil {
+	if stmt.QueryRow(id).Scan(&result); errc != nil {
 		return false, errc
 	}
 	db.Close()
