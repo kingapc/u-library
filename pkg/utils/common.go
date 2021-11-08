@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -16,11 +17,12 @@ type Flags struct {
 
 func GoDotEnvVariable(key string) string {
 
-	if key == "" {
+	rootPath, err := getRootProject()
+	if key == "" || err != nil {
 		return KeyNotFound.Error()
 	}
 
-	err := godotenv.Load(".env")
+	err = godotenv.Load(rootPath + ".env")
 
 	if err != nil {
 		return EnvNotLoaded.Error()
@@ -56,4 +58,21 @@ func IsValidUUID(u string) (string, bool) {
 	_, err := uuid.Parse(u)
 
 	return u, (err == nil)
+}
+
+func getRootProject() (string, error) {
+
+	//Get current work directory
+	cd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	//Define the project name
+	re := regexp.MustCompile(`^(.*` + "u-library" + `)`)
+
+	//Find the root path into the current work directory
+	rootPath := re.Find([]byte(cd))
+
+	return string(rootPath) + "\\", nil
 }

@@ -1,30 +1,50 @@
 # Install Go and Go tool into VS Code
 
 # Install Redis
-https://github.com/microsoftarchive/redis/releases/download/win-3.0.504/Redis-x64-3.0.504.msi
+1. Download from https://github.com/microsoftarchive/redis/releases/download/win-3.0.504/Redis-x64-3.0.504.msi
 
 # Install Postgres
-https://content-www.enterprisedb.com/postgresql-tutorial-resources-training?cid=924
+1. Download from https://content-www.enterprisedb.com/postgresql-tutorial-resources-training?cid=924
+2. Change the password into .env file, using the password that you set up.
 
 # Create the database
 library
 
-# Into the library database, run the script
-Go to Schemas and create one using --> CreateSchema.sql
+# Create a Schema
+1. Select the "library" database 
+2. Open a new Query Tool
+3. Open the script CreateSchema.sql located in .\local_install\db\ directory
+4. Run the script.
 
-# Restore backup
-Go to university schema and restore the backup using --> u-library.sql
+This script is to create the university schema
 
-# Execute the next command into University Schema into Library database
-CREATE EXTENSION pgcrypto;
+# Restore the Database
+1. Select the "university" schema
+2. Rigth click on university and select "Restore.."
+3. Load the sql file "u-library.sql" located in .\local_install\db\ directory
+4. Run the script.
 
-# restore the postman collection from 
-Collection.json
+This script is to create the table structure
 
-# Open the app and open a new terminal and change directory to u-library and execute
-go run .
+# Add a pgcrypto extension in Postgresql
+1. Open a new Query Tool
+2. Execute the next command CREATE EXTENSION pgcrypto;
 
-# Unit testing book_test.go
+This command eneables the extension pgcrypto.
 
-Move to .\pkg\handler
-execute go test .
+# Postman set up
+1. Restore the collection located in .\local_install\collections\
+2. Follow the steps in Postman to restore the Collection.json
+
+# Run API
+1. Open the app in VS Code
+2. Open a new terminal
+3. Make sure that you are in the directory .\u-library
+4. Execute the command go run .
+
+# Run Unit Testing
+1. Open the app in VS Code
+2. Open a new terminal
+3. Make sure that you are in the directory .\u-library
+4. Execute the comman go test -v <package name>
+    i.e go test -v .\test\pkg\handler
