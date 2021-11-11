@@ -8,7 +8,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func ValidateTokenSession() gin.HandlerFunc {

@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/model"
+	"github.com/rpinedafocus/u-library/internal/utils"
 	"github.com/twinj/uuid"
 
 	"os"

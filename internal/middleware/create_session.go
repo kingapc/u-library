@@ -3,7 +3,7 @@ package securitty
 import (
 	"time"
 
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
+	"github.com/rpinedafocus/u-library/internal/model"
 )
 
 func CreateSession(id string, td *model.TokenDetails) error {
