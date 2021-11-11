@@ -2,9 +2,9 @@ package securitty
 
 import (
 	"crypto/tls"
-	"time"
+	"fmt"
 
-	"github.com/go-redis/redis/v7"
+	"github.com/go-redis/redis"
 	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
 )
 
@@ -18,21 +18,27 @@ func Init() {
 	// }
 
 	opt, err := redis.ParseURL(utils.GoDotEnvVariable("REDIS_HOST"))
+
+	fmt.Print(opt.Addr + "\n")
+	fmt.Print(opt.Password + "\n")
+	fmt.Print(opt.DB)
+	fmt.Print("\n")
+
 	if err != nil {
+		fmt.Print("error1")
 		panic(err.Error())
 	}
 
 	Client = redis.NewClient(&redis.Options{
-		Addr:        opt.Addr,
-		Password:    opt.Password,
-		DB:          opt.DB,
-		IdleTimeout: 5 * time.Minute,
-		MaxRetries:  2,
-		TLSConfig:   &tls.Config{},
+		Addr:      opt.Addr,
+		Password:  opt.Password,
+		DB:        opt.DB,
+		TLSConfig: &tls.Config{},
 	})
 
 	_, err = Client.Ping().Result()
 	if err != nil {
+		fmt.Print("error2")
 		panic(err.Error())
 	}
 }

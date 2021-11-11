@@ -1,13 +1,14 @@
 package securitty
 
 import (
+	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
 	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
 )
 
 func DestroySession(access string) error {
 
 	//delete access token
-	deletedAt, err := Client.Del(access).Result()
+	deletedAt, err := security.Client.Del(access).Result()
 	if err != nil {
 		return err
 	}

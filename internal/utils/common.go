@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
 	"github.com/twinj/uuid"
 )
 
@@ -19,13 +20,13 @@ func GoDotEnvVariable(key string) string {
 
 	rootPath, err := getRootProject()
 	if key == "" || err != nil {
-		return KeyNotFound.Error()
+		return utils.KeyNotFound.Error()
 	}
 
 	err = godotenv.Load(rootPath + ".env")
 
 	if err != nil {
-		return EnvNotLoaded.Error()
+		return utils.EnvNotLoaded.Error()
 	}
 
 	return os.Getenv(key)
