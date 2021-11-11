@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	handler "github.com/rpinedafocus/u-library/internal/app/u-library/handler"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
+	handler "github.com/rpinedafocus/u-library/internal/handler"
+	"github.com/rpinedafocus/u-library/internal/model"
 	"github.com/stretchr/testify/assert"
 )
 

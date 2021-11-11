@@ -3,7 +3,7 @@ package conn
 import (
 	"testing"
 
-	conn "github.com/rpinedafocus/u-library/internal/app/u-library/db"
+	conn "github.com/rpinedafocus/u-library/internal/db"
 )
 
 func TestGetConnection(t *testing.T) {

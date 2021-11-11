@@ -4,11 +4,11 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func TestGoDotEnvVariable(t *testing.T) {
-	item := "postgres"
+	item := "doadmin"
 	want := regexp.MustCompile(`\b` + item + `\b`)
 	msg := utils.GoDotEnvVariable("DBUSER")
 

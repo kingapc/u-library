@@ -19,14 +19,8 @@ func Init() {
 
 	opt, err := redis.ParseURL(utils.GoDotEnvVariable("REDIS_HOST"))
 
-	fmt.Print(opt.Addr + "\n")
-	fmt.Print(opt.Password + "\n")
-	fmt.Print(opt.DB)
-	fmt.Print("\n")
-
 	if err != nil {
-		fmt.Print("error1")
-		panic(err.Error())
+		fmt.Print(err.Error())
 	}
 
 	Client = redis.NewClient(&redis.Options{
