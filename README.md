@@ -12,5 +12,5 @@
 1. Execute the command go test -v ./...
 
 # Run Unit Testing by Directory
-1. Execute the command go test <directory-name>
+1. Execute the command go test "directory-name"
 2. i.e go test -v ./test/db
