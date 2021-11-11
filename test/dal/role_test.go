@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	dal "github.com/rpinedafocus/u-library/internal/app/u-library/dal"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
+	dal "github.com/rpinedafocus/u-library/internal/dal"
+	"github.com/rpinedafocus/u-library/internal/model"
 )
 
 func TestCreateRole(t *testing.T) {

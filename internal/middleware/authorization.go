@@ -7,7 +7,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/rpinedafocus/u-library/internal/dal"
-	security "github.com/rpinedafocus/u-library/internal/middleware"
 	"github.com/rpinedafocus/u-library/internal/model"
 	"github.com/rpinedafocus/u-library/internal/utils"
 )
@@ -24,7 +23,7 @@ func PrepareLogin(user string, password string) (*model.UserEntity, error) {
 
 func ExtractTokenMetadata(r *http.Request) (*model.AccessDetails, error) {
 
-	token, err := security.VerifyToken(r)
+	token, err := VerifyToken(r)
 	if err != nil {
 		return nil, err
 	}

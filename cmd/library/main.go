@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	handler "github.com/rpinedafocus/u-library/internal/app/u-library/handler"
-	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
+	handler "github.com/rpinedafocus/u-library/internal/handler"
+	security "github.com/rpinedafocus/u-library/internal/middleware"
 )
 
 func main() {
