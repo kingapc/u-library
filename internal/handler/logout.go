@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
+	security "github.com/rpinedafocus/u-library/internal/middleware"
 )
 
 func LogoutController(c *gin.Context) {

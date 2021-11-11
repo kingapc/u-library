@@ -1,8 +1,8 @@
 package securitty
 
 import (
-	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	security "github.com/rpinedafocus/u-library/internal/middleware"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func DestroySession(access string) error {

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 
-	conn "github.com/rpinedafocus/u-library/internal/app/u-library/db"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	conn "github.com/rpinedafocus/u-library/internal/db"
+	"github.com/rpinedafocus/u-library/internal/model"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func Login(user string, password string) (*model.UserEntity, error) {

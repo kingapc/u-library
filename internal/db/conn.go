@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	_ "github.com/lib/pq"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 var (

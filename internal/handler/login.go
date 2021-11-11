@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	security "github.com/rpinedafocus/u-library/internal/middleware"
+	"github.com/rpinedafocus/u-library/internal/model"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func LoginController(c *gin.Context) {

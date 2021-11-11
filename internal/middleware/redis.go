@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 var Client *redis.Client

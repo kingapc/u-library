@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/dal"
-	security "github.com/rpinedafocus/u-library/internal/app/u-library/middleware"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/model"
-	"github.com/rpinedafocus/u-library/internal/app/u-library/utils"
+	"github.com/rpinedafocus/u-library/internal/dal"
+	security "github.com/rpinedafocus/u-library/internal/middleware"
+	"github.com/rpinedafocus/u-library/internal/model"
+	"github.com/rpinedafocus/u-library/internal/utils"
 )
 
 func CreateAuthorController(c *gin.Context) {
