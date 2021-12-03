@@ -3,13 +3,23 @@ package conn
 import (
 	"testing"
 
-	conn "github.com/rpinedafocus/u-library/internal/db"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/stretchr/testify/assert"
 )
 
-func TestGetConnection(t *testing.T) {
-	db, err := conn.GetConnection()
+func TestGetConnectionSuccess(t *testing.T) {
+	db, mock, _ := sqlmock.New()
 
-	if db == nil || err != nil {
-		t.Fatalf(`Fail to connect the data base for %#v and  %#q`, db, err)
+	if db != nil && mock != nil {
+		assert.NotNil(t, db)
+		assert.NotNil(t, mock)
+	}
+}
+
+func TestGetConnectionFail(t *testing.T) {
+	_, _, err := sqlmock.New()
+
+	if err == nil {
+		assert.Nil(t, err)
 	}
 }
